@@ -1,0 +1,24 @@
+	REQUESITOS FUNCIONAIS
+
+O sistema deve permitir que o utilizador se registe com email e palavra-passe.
+O utilizador deve poder visualizar os filmes em exibição.
+O sistema deve permitir ao utilizador consultar horários e salas disponíveis para cada filme.
+O utilizador deve poder selecionar lugares numa planta interativa da sala.
+O sistema deve permitir ao administrador adicionar, editar ou remover filmes, sessões, bilhetes, produtos e salas e as suas características.
+O Sistema deve permitir ao utilizador comprar mais que um bilhete.
+O sistema deve permitir a compra de produtos (como pipocas, bebidas) juntamente com os bilhetes.
+O utilizador deve poder cancelar bilhetes dentro de um período definido antes da sessão.
+O sistema deve permitir integração com métodos de pagamento (cartão, MBWay, etc.).
+O sistema deve evitar que dois utilizadores reservem o mesmo lugar ao mesmo tempo.
+O administrador deve poder criar promoções ou códigos de desconto aplicáveis a bilhetes e produtos.
+O administrador deve poder criar promoções ou códigos de desconto aplicáveis a bilhetes e produtos.
+
+
+	REQUESITOS NAO FUNCIONAIS
+
+O sistema deve estar disponível 24 horas por dia, 7 dias por semana.
+A aplicação deve estar traduzida em, pelo menos, português e inglês.
+A interface deve ser intuitiva e permitir concluir a compra de um bilhete em, no máximo, 5 passos.
+Deve existir feedback visual claro (ex: mensagens de erro e sucesso) em todas as ações do utilizador.
+A arquitetura da aplicação deve permitir escalar horizontalmente os serviços backend.
+
