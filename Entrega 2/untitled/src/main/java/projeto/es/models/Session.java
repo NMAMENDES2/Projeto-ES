@@ -8,8 +8,7 @@ public class Session extends Entity {
     public LinkedList<Ticket> tickets; // ?
     public String sessionStart;
 
-    public Session(int id, Room room){
-        super(id);
+    public Session(Room room){
         full = false;
         tickets = new LinkedList<>();
         sessionStart = "";

@@ -20,9 +20,9 @@ public class TicketFrame extends JFrame {
 
         JButton addButton = new JButton("Add Ticket");
         addButton.addActionListener(e -> {
-            Room room = new Room(1, "Sala1", 12);
-            Session session = new Session(1, room);
-            Ticket ticket = new Ticket(1, 12, session);
+            Room room = new Room("Sala1", 12);
+            Session session = new Session(room);
+            Ticket ticket = new Ticket(1, session);
             user.addTicket(ticket);
             ticketListModel.addElement(ticket.toString());
         });

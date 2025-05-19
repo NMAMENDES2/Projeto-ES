@@ -3,8 +3,7 @@ package projeto.es.models;
 public abstract class NamedEntity extends Entity {
     private String name;
 
-    public NamedEntity(int id, String name) {
-        super(id);
+    public NamedEntity(String name) {
         this.name = name;
     }
 

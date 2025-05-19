@@ -8,8 +8,8 @@ public class User extends NamedEntity {
     private String password;
     private LinkedList<Ticket> tickets;
 
-    public User(int id, String name, String password) {
-        super(id, name);
+    public User(String name, String password) {
+        super(name);
         this.tickets = new LinkedList<Ticket>();
         this.password = password;
     }

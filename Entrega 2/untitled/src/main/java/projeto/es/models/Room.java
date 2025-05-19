@@ -6,8 +6,8 @@ public class Room extends NamedEntity{
     private String seatType;
     private String acessibility;
 
-    public Room(int id, String name, int capacity){
-        super(id, name);
+    public Room(String name, int capacity){
+        super(name);
         this.capacity = capacity;
         this.soundLevel = "";
         this.seatType = "";

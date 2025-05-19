@@ -1,10 +1,11 @@
 package projeto.es.models;
 
 public abstract class Entity {
-    private final int id;
+    private static int nextId = 1;
+    private int id;
 
-    public Entity(int id) {
-        this.id = id;
+    public Entity() {
+        this.id = nextId++;
     }
 
     public int getId() {

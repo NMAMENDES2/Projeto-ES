@@ -2,25 +2,20 @@ package projeto.es.models;
 
 import java.util.Date;
 
-public class Film {
-    private int id;
+public class Film extends Entity{
     private String title;
     private String director;
     private Date launchDate;
     private String ageRestriction;
     private int duration;
 
-    public Film(int id, String titulo, String realizacao, Date dataDeLancamento, String restricaoDeIdade, int duracao) {
-        this.id = id;
+    public Film(String titulo, String realizacao, Date dataDeLancamento, String restricaoDeIdade, int duracao) {
+        super();
         this.title = titulo;
         this.director = realizacao;
         this.launchDate = dataDeLancamento;
         this.ageRestriction = restricaoDeIdade;
         this.duration = duracao;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getTitle() {
@@ -65,7 +60,6 @@ public class Film {
 
     public String toString() {
         return "Film {" +
-                "id=" + id +
                 ", title='" + title + '\'' +
                 ", director='" + director + '\'' +
                 ", launch date=" + launchDate +

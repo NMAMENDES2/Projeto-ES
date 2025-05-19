@@ -7,8 +7,7 @@ public class Ticket extends Entity{
     public Session session;
     public LinkedList<User> holders;
 
-    public Ticket(int id, double price, Session session) {
-        super(id);
+    public Ticket(double price, Session session) {
         this.price = price;
         this.holders = new LinkedList<>();
         this.session = session;
