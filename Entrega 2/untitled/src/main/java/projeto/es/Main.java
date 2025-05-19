@@ -1,17 +1,21 @@
 package projeto.es;
 
+import projeto.es.controllers.TicketController;
+import projeto.es.models.Room;
+import projeto.es.models.Session;
 import projeto.es.models.Ticket;
 import projeto.es.models.User;
 
 public class Main {
     public static void main(String[] args) {
-        User teste1 = new User(1, "Nuno");
-        User teste2 = new User(2, "OP");
+        TicketController ticketController = new TicketController();
 
-        Ticket ticket1 = new Ticket(1, 12);
-        Ticket ticket2 = new Ticket(1, 12);
+        User user = new User(1, "P", "12333");
+        Room room = new Room(1, "N", 2);
+        Session session = new Session(1, room);
+        Ticket ticket = new Ticket(1, 12, session);
 
-        teste1.addTicket(ticket1);
-        teste2.addTicket(ticket2);
+        ticketController.assignTicket(ticket, user);
+
     }
 }

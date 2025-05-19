@@ -5,11 +5,13 @@ import java.util.LinkedList;
 public class User extends NamedEntity {
 
     private String email;
+    private String password;
     private LinkedList<Ticket> tickets;
 
-    public User(int id, String name) {
+    public User(int id, String name, String password) {
         super(id, name);
         this.tickets = new LinkedList<Ticket>();
+        this.password = password;
     }
 
     public String getEmail() {
@@ -20,8 +22,13 @@ public class User extends NamedEntity {
         this.email = email;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+
     // Isto vai para os controllers
-    protected void addTicket(Ticket ticket) {
+    public void addTicket(Ticket ticket) {
         tickets.add(ticket);
     }
 }

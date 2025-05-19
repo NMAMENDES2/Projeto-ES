@@ -8,24 +8,23 @@ public class Session extends Entity {
     public LinkedList<Ticket> tickets; // ?
     public String sessionStart;
 
-    public Session(int id){
+    public Session(int id, Room room){
         super(id);
         full = false;
-        room = null;
         tickets = new LinkedList<>();
         sessionStart = "";
+        this.room = room;
     }
 
-    public void isFull(){
-        if(tickets.size() >= room.getCapacity()){
-            full = true;
-        }
+    public boolean isFull(){
+        return full;
     }
 
     public void addTicket(Ticket ticket){
-        if(this.full){
-            tickets.add(ticket);
+        if (tickets.size() > room.getCapacity()){
+            full = true;
+            return;
         }
-        throw new IllegalStateException("Session is already full");
+        tickets.add(ticket);
     }
 }
