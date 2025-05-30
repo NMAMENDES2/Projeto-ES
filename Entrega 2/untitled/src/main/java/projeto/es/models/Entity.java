@@ -4,11 +4,15 @@ public abstract class Entity {
     private static int nextId = 1;
     private int id;
 
-    public Entity() {
+    protected Entity() {
         this.id = nextId++;
     }
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

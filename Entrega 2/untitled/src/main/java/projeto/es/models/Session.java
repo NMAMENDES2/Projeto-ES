@@ -1,29 +1,59 @@
 package projeto.es.models;
 
-import java.util.LinkedList;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Session extends Entity {
-    public boolean full;
-    public Room room;
-    public LinkedList<Ticket> tickets; // ?
-    public String sessionStart;
+    private Movie movie;
+    private Room room;
+    private LocalDateTime startTime;
+    private double price;
+    private boolean[][] occupiedSeats;
+    private static final DateTimeFormatter DISPLAY_FORMATTER = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
 
-    public Session(Room room){
-        full = false;
-        tickets = new LinkedList<>();
-        sessionStart = "";
+    public Session(Movie movie, Room room, LocalDateTime startTime, double price) {
+        super();
+        this.movie = movie;
         this.room = room;
+        this.startTime = startTime;
+        this.price = price;
+        this.occupiedSeats = new boolean[room.getRows()][room.getColumns()];
     }
 
-    public boolean isFull(){
-        return full;
+    // Getters
+    public Movie getMovie() { return movie; }
+    public Room getRoom() { return room; }
+    public LocalDateTime getStartTime() { return startTime; }
+    public double getPrice() { return price; }
+    public boolean[][] getOccupiedSeats() { return occupiedSeats; }
+
+    // Setters
+    public void setMovie(Movie movie) { this.movie = movie; }
+    public void setRoom(Room room) { this.room = room; }
+    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
+    public void setPrice(double price) { this.price = price; }
+
+    // Seat management
+    public boolean isSeatOccupied(int row, int col) {
+        return occupiedSeats[row][col];
     }
 
-    public void addTicket(Ticket ticket){
-        if (tickets.size() > room.getCapacity()){
-            full = true;
-            return;
-        }
-        tickets.add(ticket);
+    public void occupySeat(int row, int col) {
+        occupiedSeats[row][col] = true;
+    }
+
+    public void freeSeat(int row, int col) {
+        occupiedSeats[row][col] = false;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s - %s (%s%s) - $%.2f", 
+            movie.getName(),
+            startTime.format(DISPLAY_FORMATTER),
+            room.getName(),
+            room.is3D() ? " - 3D" : "",
+            price
+        );
     }
 }

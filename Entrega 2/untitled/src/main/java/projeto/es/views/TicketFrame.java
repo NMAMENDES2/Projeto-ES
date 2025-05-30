@@ -7,7 +7,6 @@ import projeto.es.models.User;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
 public class TicketFrame extends JFrame {
     private User user;
@@ -15,14 +14,27 @@ public class TicketFrame extends JFrame {
     private JList<String> ticketList = new JList<>(ticketListModel);
 
     public TicketFrame(User user) {
-        super("Tickets for " + user.getName());
+        super("Tickets for " + user.getUsername());
         this.user = user;
 
         JButton addButton = new JButton("Add Ticket");
         addButton.addActionListener(e -> {
-            Room room = new Room("Sala1", 12);
-            Session session = new Session(room);
-            Ticket ticket = new Ticket(1, session);
+            Room room = new Room(
+                "room1", 
+                "Room 1", 
+                6, 
+                8, 
+                false
+            );
+            Session session = new Session(
+                "session1",
+                "movie1",
+                room.getId(),
+                java.time.LocalDateTime.now(),
+                room.getRows(),
+                room.getColumns()
+            );
+            Ticket ticket = new Ticket(1, session, 1, 1);
             user.addTicket(ticket);
             ticketListModel.addElement(ticket.toString());
         });
@@ -32,7 +44,7 @@ public class TicketFrame extends JFrame {
         add(new JScrollPane(ticketList), BorderLayout.CENTER);
 
         setSize(300, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
     }
 }

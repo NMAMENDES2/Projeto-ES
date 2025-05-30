@@ -35,7 +35,11 @@ public class LoginFrame extends JFrame {
         User user = UserDatabase.authenticate(username, password);
         if (user != null) {
             JOptionPane.showMessageDialog(this, "Login successful!");
-            new TicketFrame(user).setVisible(true);
+            if (user.isAdmin()) {
+                new AdminDashboardFrame(user).setVisible(true);
+            } else {
+                new MovieCatalogFrame(user).setVisible(true);
+            }
             this.dispose(); // close login window
         } else {
             JOptionPane.showMessageDialog(this, "Invalid credentials.", "Error", JOptionPane.ERROR_MESSAGE);

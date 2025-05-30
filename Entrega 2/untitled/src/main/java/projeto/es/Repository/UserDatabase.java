@@ -9,8 +9,8 @@ public class UserDatabase {
     private static Map<String, User> users = new HashMap<>();
 
     static {
-        users.put("alice", new User("alice", "password123"));
-        users.put("bob", new User("d", "password123"));
+        users.put("alice", new User("alice", "password123", true));
+        users.put("bob", new User("bob", "password123", false));
     }
 
     public static User authenticate(String username, String password) {
