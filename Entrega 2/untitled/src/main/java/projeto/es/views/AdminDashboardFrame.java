@@ -1,4 +1,5 @@
 package projeto.es.views;
+import projeto.es.views.*;
 
 import projeto.es.Repository.MovieDatabase;
 import projeto.es.Repository.RoomDatabase;

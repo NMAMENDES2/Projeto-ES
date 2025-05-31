@@ -1,4 +1,5 @@
 package projeto.es.views;
+import projeto.es.views.*;
 
 import projeto.es.models.User;
 import projeto.es.Repository.UserDatabase;
@@ -111,12 +112,12 @@ public class LoginFrame extends JFrame {
             User.setCurrentUser(user);
             if (user.isAdmin()) {
                 System.out.println("DEBUG: Creating AdminDashboardFrame");
-                AdminDashboardFrame adminFrame = new AdminDashboardFrame(user);
+                projeto.es.views.AdminDashboardFrame adminFrame = new projeto.es.views.AdminDashboardFrame(user);
                 adminFrame.setVisible(true);
             } else {
                 System.out.println("DEBUG: Creating ClientFrame");
                 try {
-                    ClientFrame clientFrame = new ClientFrame(user);
+                    ClientFrame clientFrame = new projeto.es.views.ClientFrame(user);
                     System.out.println("DEBUG: ClientFrame created successfully");
                     clientFrame.setVisible(true);
                     System.out.println("DEBUG: ClientFrame set to visible");
