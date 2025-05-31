@@ -30,6 +30,9 @@ public class BookingFrame extends JFrame {
         
         setLayout(new BorderLayout(10, 10));
         
+        // Create main content panel
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        
         // Top panel with movie details and session selection
         JPanel topPanel = new JPanel(new BorderLayout(10, 10));
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -42,16 +45,22 @@ public class BookingFrame extends JFrame {
         JPanel sessionPanel = createSessionPanel();
         topPanel.add(sessionPanel, BorderLayout.SOUTH);
         
-        add(topPanel, BorderLayout.NORTH);
+        mainPanel.add(topPanel, BorderLayout.NORTH);
         
-        // Price display
+        // Create a scroll pane for the main content
+        JScrollPane mainScrollPane = new JScrollPane(mainPanel);
+        mainScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        mainScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        mainScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        add(mainScrollPane, BorderLayout.CENTER);
+        
+        // Price display and payment button in a separate panel outside scroll pane
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
         priceLabel = new JLabel("Total: $0.00");
         priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
         priceLabel.setFont(new Font(priceLabel.getFont().getName(), Font.BOLD, 16));
-        priceLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
-        // Bottom panel with price and confirm button
-        JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.add(priceLabel, BorderLayout.CENTER);
         
         JButton confirmButton = new JButton("Proceed to Payment");
@@ -67,7 +76,12 @@ public class BookingFrame extends JFrame {
             updateSeatSelection();
         }
         
-        setSize(800, 600);
+        // Set frame size based on screen size
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        setSize(new Dimension(
+            (int)(screenSize.width * 0.7),
+            (int)(screenSize.height * 0.8)
+        ));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
@@ -110,8 +124,9 @@ public class BookingFrame extends JFrame {
                 public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                     if (value instanceof Session) {
                         Session session = (Session) value;
-                        String text = String.format("%s - $%.2f", 
+                        String text = String.format("%s - Room: %s - $%.2f", 
                             session.getStartTime().format(DATE_FORMATTER),
+                            session.getRoom().getName(),
                             session.getPrice());
                         return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
                     }
@@ -143,10 +158,13 @@ public class BookingFrame extends JFrame {
     private void updateSeatSelection() {
         if (currentSession != null) {
             if (seatSelectionPanel != null) {
-                remove(seatSelectionPanel);
+                ((JPanel)((JScrollPane)getContentPane().getComponent(0)).getViewport().getView()).remove(seatSelectionPanel);
             }
             seatSelectionPanel = new SeatSelectionPanel(currentSession, this::updatePrice);
-            add(seatSelectionPanel, BorderLayout.CENTER);
+            
+            // Add the seat selection panel to the main panel
+            ((JPanel)((JScrollPane)getContentPane().getComponent(0)).getViewport().getView()).add(seatSelectionPanel, BorderLayout.CENTER);
+            
             revalidate();
             repaint();
             updatePrice();

@@ -57,17 +57,54 @@ public class SeatSelectionPanel extends JPanel {
         seatsGrid.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         seatButtons = new JToggleButton[rows][cols];
         
+        // Calculate button size based on room dimensions
+        // Make buttons slightly smaller but maintain minimum size
+        int buttonSize = Math.max(25, Math.min(35, Math.min(600 / cols, 400 / rows)));
+        Dimension buttonDimension = new Dimension(buttonSize, buttonSize);
+        
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 JToggleButton seatButton = createSeatButton(row, col);
+                seatButton.setPreferredSize(buttonDimension);
                 seatButtons[row][col] = seatButton;
                 seatsGrid.add(seatButton);
             }
         }
         
-        // Center the grid
+        // Create a scroll pane for the grid
+        JScrollPane scrollPane = new JScrollPane(seatsGrid);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.getHorizontalScrollBar().setUnitIncrement(16);
+        
+        // Set preferred size for scroll pane - make it smaller
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int maxHeight = (int)(screenSize.height * 0.5); // 50% of screen height
+        int maxWidth = (int)(screenSize.width * 0.6);   // 60% of screen width
+        
+        // Calculate total grid size including spacing and borders
+        int totalWidth = (buttonSize + 5) * cols + 40;  // Add padding
+        int totalHeight = (buttonSize + 5) * rows + 40; // Add padding
+        
+        // Set a fixed size that's smaller but maintains aspect ratio
+        double aspectRatio = (double)totalWidth / totalHeight;
+        int preferredHeight = Math.min(maxHeight, 400); // Limit height to 400 pixels
+        int preferredWidth = (int)(preferredHeight * aspectRatio);
+        
+        if (preferredWidth > maxWidth) {
+            preferredWidth = maxWidth;
+            preferredHeight = (int)(preferredWidth / aspectRatio);
+        }
+        
+        scrollPane.setPreferredSize(new Dimension(
+            Math.min(maxWidth, preferredWidth),
+            Math.min(maxHeight, preferredHeight)
+        ));
+        
+        // Center the scroll pane
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        centerPanel.add(seatsGrid);
+        centerPanel.add(scrollPane);
         add(centerPanel, BorderLayout.CENTER);
     }
 
@@ -94,8 +131,6 @@ public class SeatSelectionPanel extends JPanel {
                 g2.dispose();
             }
         };
-        
-        seatButton.setPreferredSize(new Dimension(45, 45));
         
         // Override default button UI
         seatButton.setContentAreaFilled(false);
