@@ -1,0 +1,6 @@
+DRINK3|Orange Juice|3.99|77|Drinks|Fresh squeezed 400ml||0
+DRINK2|Beer|4.99|50|Drinks|330ml||18
+DRINK1|Coca-Cola|2.99|100|Drinks|Regular 500ml||0
+SNACK1|Popcorn|4.99|100|Snacks|Large bucket|Corn|0
+SNACK3|Chocolate Bar|2.99|80|Snacks|Milk chocolate|Soy,Milk|0
+SNACK2|Peanuts|3.99|50|Snacks|Salted 200g|Peanuts,Tree Nuts|0
