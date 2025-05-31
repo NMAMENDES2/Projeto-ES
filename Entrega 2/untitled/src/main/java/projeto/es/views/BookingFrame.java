@@ -8,16 +8,20 @@ import projeto.es.Repository.SessionDatabase;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.awt.event.ItemEvent;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BookingFrame extends JFrame {
     private final User user;
     private final Movie movie;
     private JComboBox<Session> sessionComboBox;
-    private JPanel seatsPanel;
-    private final boolean[][] selectedSeats = new boolean[6][8]; // 6 rows, 8 seats per row
-    private final List<JToggleButton> seatButtons = new ArrayList<>();
+    private SeatSelectionPanel seatSelectionPanel;
+    private JLabel priceLabel;
+    private Session currentSession;
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     
     public BookingFrame(User user, Movie movie) {
         super("Book Tickets - " + movie.getName());
@@ -26,30 +30,59 @@ public class BookingFrame extends JFrame {
         
         setLayout(new BorderLayout(10, 10));
         
-        // Movie details panel
+        // Top panel with movie details and session selection
+        JPanel topPanel = new JPanel(new BorderLayout(10, 10));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        // Movie details
         JPanel movieDetailsPanel = createMovieDetailsPanel();
-        add(movieDetailsPanel, BorderLayout.NORTH);
+        topPanel.add(movieDetailsPanel, BorderLayout.CENTER);
         
         // Session selection
         JPanel sessionPanel = createSessionPanel();
-        add(sessionPanel, BorderLayout.CENTER);
+        topPanel.add(sessionPanel, BorderLayout.SOUTH);
         
-        // Seats selection
-        JPanel seatsContainer = createSeatsPanel();
-        add(seatsContainer, BorderLayout.SOUTH);
+        add(topPanel, BorderLayout.NORTH);
         
-        // Confirm booking button
-        JButton confirmButton = new JButton("Confirm Booking");
+        // Price display
+        priceLabel = new JLabel("Total: $0.00");
+        priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        priceLabel.setFont(new Font(priceLabel.getFont().getName(), Font.BOLD, 16));
+        priceLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        // Bottom panel with price and confirm button
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.add(priceLabel, BorderLayout.CENTER);
+        
+        JButton confirmButton = new JButton("Proceed to Payment");
         confirmButton.addActionListener(e -> handleBooking());
-        add(confirmButton, BorderLayout.SOUTH);
+        bottomPanel.add(confirmButton, BorderLayout.SOUTH);
         
-        setSize(600, 500);
+        add(bottomPanel, BorderLayout.SOUTH);
+        
+        // Initial setup
+        List<Session> sessions = getAvailableSessions();
+        if (!sessions.isEmpty()) {
+            currentSession = sessions.get(0);
+            updateSeatSelection();
+        }
+        
+        setSize(800, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
     
+    private List<Session> getAvailableSessions() {
+        LocalDateTime now = LocalDateTime.now();
+        return SessionDatabase.getSessionsForMovie(movie.getId())
+            .stream()
+            .filter(s -> s.getStartTime().isAfter(now))
+            .sorted((s1, s2) -> s1.getStartTime().compareTo(s2.getStartTime()))
+            .collect(Collectors.toList());
+    }
+    
     private JPanel createMovieDetailsPanel() {
-        JPanel panel = new JPanel(new GridLayout(4, 1));
+        JPanel panel = new JPanel(new GridLayout(4, 1, 5, 5));
         panel.setBorder(BorderFactory.createTitledBorder("Movie Details"));
         
         panel.add(new JLabel("Title: " + movie.getName()));
@@ -61,76 +94,96 @@ public class BookingFrame extends JFrame {
     }
     
     private JPanel createSessionPanel() {
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel.setBorder(BorderFactory.createTitledBorder("Select Session"));
         
-        List<Session> sessions = SessionDatabase.getSessionsForMovie(movie.getId());
-        sessionComboBox = new JComboBox<>(sessions.toArray(new Session[0]));
-        panel.add(sessionComboBox);
+        List<Session> availableSessions = getAvailableSessions();
         
+        if (availableSessions.isEmpty()) {
+            panel.add(new JLabel("No upcoming sessions available"));
+            sessionComboBox = new JComboBox<>();
+            sessionComboBox.setEnabled(false);
+        } else {
+            sessionComboBox = new JComboBox<>(availableSessions.toArray(new Session[0]));
+            sessionComboBox.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                    if (value instanceof Session) {
+                        Session session = (Session) value;
+                        String text = String.format("%s - $%.2f", 
+                            session.getStartTime().format(DATE_FORMATTER),
+                            session.getPrice());
+                        return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
+                    }
+                    return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                }
+            });
+            
+            sessionComboBox.addItemListener(e -> {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    Session selectedSession = (Session) sessionComboBox.getSelectedItem();
+                    if (selectedSession != null && selectedSession.getStartTime().isAfter(LocalDateTime.now())) {
+                        currentSession = selectedSession;
+                        updateSeatSelection();
+                    } else {
+                        JOptionPane.showMessageDialog(this,
+                            "This session is no longer available.",
+                            "Session Unavailable",
+                            JOptionPane.ERROR_MESSAGE);
+                        sessionComboBox.setSelectedItem(currentSession);
+                    }
+                }
+            });
+        }
+        
+        panel.add(sessionComboBox);
         return panel;
     }
     
-    private JPanel createSeatsPanel() {
-        JPanel container = new JPanel(new BorderLayout());
-        container.setBorder(BorderFactory.createTitledBorder("Select Seats"));
-        
-        seatsPanel = new JPanel(new GridLayout(6, 8, 5, 5));
-        
-        // Create seat buttons
-        for (int row = 0; row < 6; row++) {
-            for (int col = 0; col < 8; col++) {
-                JToggleButton seatButton = new JToggleButton(String.format("%c%d", (char)('A' + row), col + 1));
-                seatButton.setPreferredSize(new Dimension(50, 50));
-                final int finalRow = row;
-                final int finalCol = col;
-                seatButton.addActionListener(e -> toggleSeat(finalRow, finalCol));
-                seatButtons.add(seatButton);
-                seatsPanel.add(seatButton);
+    private void updateSeatSelection() {
+        if (currentSession != null) {
+            if (seatSelectionPanel != null) {
+                remove(seatSelectionPanel);
             }
+            seatSelectionPanel = new SeatSelectionPanel(currentSession, this::updatePrice);
+            add(seatSelectionPanel, BorderLayout.CENTER);
+            revalidate();
+            repaint();
+            updatePrice();
         }
-        
-        // Add screen label
-        JLabel screenLabel = new JLabel("SCREEN", SwingConstants.CENTER);
-        screenLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        container.add(screenLabel, BorderLayout.NORTH);
-        container.add(seatsPanel, BorderLayout.CENTER);
-        
-        return container;
     }
     
-    private void toggleSeat(int row, int col) {
-        selectedSeats[row][col] = !selectedSeats[row][col];
+    private void updatePrice() {
+        if (currentSession != null && seatSelectionPanel != null) {
+            int selectedCount = seatSelectionPanel.getSelectedSeats().size();
+            double totalPrice = selectedCount * currentSession.getPrice();
+            priceLabel.setText(String.format("Total: $%.2f", totalPrice));
+        }
     }
     
     private void handleBooking() {
-        Session selectedSession = (Session) sessionComboBox.getSelectedItem();
-        if (selectedSession == null) {
+        if (currentSession == null) {
             JOptionPane.showMessageDialog(this, "Please select a session");
             return;
         }
         
-        List<Point> selectedSeatsList = new ArrayList<>();
-        for (int row = 0; row < selectedSeats.length; row++) {
-            for (int col = 0; col < selectedSeats[row].length; col++) {
-                if (selectedSeats[row][col]) {
-                    selectedSeatsList.add(new Point(row, col));
-                }
-            }
+        if (currentSession.getStartTime().isBefore(LocalDateTime.now())) {
+            JOptionPane.showMessageDialog(this,
+                "This session is no longer available.",
+                "Session Unavailable",
+                JOptionPane.ERROR_MESSAGE);
+            return;
         }
         
-        if (selectedSeatsList.isEmpty()) {
+        List<Point> selectedSeats = seatSelectionPanel.getSelectedSeats();
+        if (selectedSeats.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please select at least one seat");
             return;
         }
         
-        // Create tickets for each selected seat
-        for (Point seat : selectedSeatsList) {
-            Ticket ticket = new Ticket(selectedSession, seat.x, seat.y, user);
-            user.addTicket(ticket);
-        }
-        
-        JOptionPane.showMessageDialog(this, "Booking successful!");
-        dispose();
+        // Open payment frame
+        PaymentFrame paymentFrame = new PaymentFrame(user, currentSession, selectedSeats);
+        paymentFrame.setVisible(true);
+        dispose(); // Close booking frame
     }
 } 

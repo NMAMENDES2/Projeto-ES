@@ -1,0 +1,4 @@
+admin,admin,true
+test,test,false
+alice,password123,true
+bob,password123,false 

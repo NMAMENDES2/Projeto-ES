@@ -1,20 +1,21 @@
 package projeto.es.models;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Ticket extends Entity {
+public class Ticket {
     private Session session;
     private int row;
     private int column;
-    private User user;
+    private List<OrderItem> orderItems;
+    private double totalPrice;
 
-    public Ticket(Session session, int row, int column, User user) {
-        super();
+    public Ticket(Session session, int row, int column) {
         this.session = session;
         this.row = row;
         this.column = column;
-        this.user = user;
-        session.occupySeat(row, column);
+        this.orderItems = new ArrayList<>();
+        this.totalPrice = session.getPrice(); // Initialize with session price
     }
 
     public Session getSession() {
@@ -29,53 +30,52 @@ public class Ticket extends Entity {
         return column;
     }
 
-    public User getUser() {
-        return user;
+    public List<OrderItem> getOrderItems() {
+        return new ArrayList<>(orderItems);
     }
 
-    public double getPrice() {
+    public void addOrderItem(OrderItem item) {
+        orderItems.add(item);
+        totalPrice += item.getTotalPrice();
+    }
+
+    public void removeOrderItem(OrderItem item) {
+        if (orderItems.remove(item)) {
+            totalPrice -= item.getTotalPrice();
+        }
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public double getSessionPrice() {
         return session.getPrice();
     }
 
-    public void addHolder(User user) {
-        // This method is not used in the new implementation
-    }
-
-    public LinkedList<User> getHolders() {
-        // This method is not used in the new implementation
-        return null;
-    }
-
-    public void setSession(Session session) {
-        this.session.freeSeat(row, column);
-        this.session = session;
-        this.session.occupySeat(row, column);
-    }
-
-    public void setRow(int row) {
-        this.session.freeSeat(this.row, this.column);
-        this.row = row;
-        this.session.occupySeat(row, this.column);
-    }
-
-    public void setColumn(int column) {
-        this.session.freeSeat(this.row, this.column);
-        this.column = column;
-        this.session.occupySeat(this.row, column);
-    }
-
-    public void setUser(User user) {
-        this.user = user;
+    public double getProductsTotal() {
+        return orderItems.stream()
+            .mapToDouble(OrderItem::getTotalPrice)
+            .sum();
     }
 
     @Override
     public String toString() {
-        return String.format("Ticket #%d - %s - Row: %d, Seat: %d - $%.2f", 
-            getId(),
-            session.toString(),
-            row + 1,
-            column + 1,
-            getPrice()
-        );
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Movie: %s\n", session.getMovie().getName()));
+        sb.append(String.format("Session: %s\n", session.getStartTime()));
+        sb.append(String.format("Seat: %c%d\n", (char)('A' + row), column + 1));
+        sb.append(String.format("Ticket Price: $%.2f\n", session.getPrice()));
+        
+        if (!orderItems.isEmpty()) {
+            sb.append("\nConcessions:\n");
+            for (OrderItem item : orderItems) {
+                sb.append(String.format("- %s\n", item.toString()));
+            }
+            sb.append(String.format("\nProducts Total: $%.2f", getProductsTotal()));
+        }
+        
+        sb.append(String.format("\nTotal Price: $%.2f", totalPrice));
+        return sb.toString();
     }
 }

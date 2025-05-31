@@ -1,43 +1,53 @@
 package projeto.es.models;
 
-import java.util.LinkedList;
+import projeto.es.Repository.TicketDatabase;
+import java.util.List;
 
-public class User extends NamedEntity {
-
-    private String email;
+public class User {
+    private String name;
     private String password;
-    private LinkedList<Ticket> tickets;
     private boolean isAdmin;
+    private static User currentUser;
 
     public User(String name, String password, boolean isAdmin) {
-        super(name);
-        this.tickets = new LinkedList<Ticket>();
+        this.name = name;
         this.password = password;
         this.isAdmin = isAdmin;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public String getName() {
+        return name;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public String getUsername() {
-        return getName();
-    }
-
     public boolean isAdmin() {
         return isAdmin;
     }
 
-    // Isto vai para os controllers
+    public String getUsername() {
+        return name;
+    }
+
+    public static void setCurrentUser(User user) {
+        currentUser = user;
+    }
+
+    public static User getCurrentUser() {
+        return currentUser;
+    }
+
+    public List<Ticket> getTickets() {
+        return TicketDatabase.getTicketsForUser(name);
+    }
+
     public void addTicket(Ticket ticket) {
-        tickets.add(ticket);
+        TicketDatabase.saveTicket(ticket);
+    }
+
+    public void removeTicket(Ticket ticket) {
+        TicketDatabase.removeTicket(ticket);
     }
 }
