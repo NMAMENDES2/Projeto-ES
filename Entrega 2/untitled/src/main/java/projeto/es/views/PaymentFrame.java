@@ -2,6 +2,7 @@ package projeto.es.views;
 
 import projeto.es.models.*;
 import projeto.es.Repository.ProductDatabase;
+import projeto.es.Repository.SessionDatabase;
 
 import javax.swing.*;
 import java.awt.*;
@@ -245,12 +246,15 @@ public class PaymentFrame extends JFrame {
             session.occupySeat(seat.x, seat.y);
         }
         
+        // Save the updated session to persist occupied seats
+        SessionDatabase.saveSession(session);
+        
         // Show success message
         JOptionPane.showMessageDialog(this,
             String.format("Payment successful!\nTotal amount: $%.2f", totalPrice),
             "Payment Complete",
             JOptionPane.INFORMATION_MESSAGE);
-        
-        dispose();
+            
+        dispose(); // Close payment window
     }
 } 
